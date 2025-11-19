@@ -1,3 +1,4 @@
+
 # REACT-PROYECTO
 
 # 1. ANALISIS DE REPOSITORIO <br>
@@ -94,38 +95,58 @@ export default function AnimalForm({
 -la diferencia entre estos esque un compnente presentacional se enfoca en la parte visual y no depende de una api, mientras que un componente de pagina se enfoco en como funciona algo. (EJ)
 
 ```bash
-aqui vemos un componente presentacional que es el cambio de tema (claro, oscuro) este solo se enfoca en lo visual de la pagina
+aqui vemos un componente presentacional que es un card 
 
-export default function DarkModeToggle({ className = "" }) {
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains("dark")
-  );
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-    try {
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    } catch {
-      /* no-op */
-    }
-  }, [isDark]);
+export default function AnimalCard({ animal, onSelect }) {
+  const { name, type, age, weight, status } = animal;
+
+  // Estilos condicionales según estado del animal
+  const statusColors = {
+    healthy:
+      "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-200 dark:border-green-900/50",
+    review:
+      "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-200 dark:border-yellow-900/50",
+    sick: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900/50",
+  };
 
   return (
-    <button
-      type="button"
-      onClick={() => setIsDark((v) => !v)}
-      className={`fixed bottom-4 right-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm 
-                  backdrop-blur supports-[backdrop-filter]:bg-white/70 border-gray-300 text-gray-800 
-                  hover:bg-white shadow-sm
-                  dark:supports-[backdrop-filter]:bg-neutral-800/60 dark:border-neutral-700 dark:text-gray-100 
-                  dark:hover:bg-neutral-800 ${className}`}
-      aria-pressed={isDark}
-      aria-label="Toggle dark mode"
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+    <article
+      role="article"
+      tabIndex="0"
+      className={`flex flex-col gap-2 rounded-xl border p-4 shadow-sm transition hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer ${statusColors[status]}`}
+      onClick={() => onSelect?.(animal)}
     >
-      <span aria-hidden="true">{isDark ? "🌙" : "☀️"}</span>
-      <span>{isDark ? "Dark" : "Light"}</span>
-    </button>
+      <header className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">{name}</h2>
+        <span
+          className={`px-2 py-0.5 text-xs font-medium rounded-full capitalize ${
+            status === "healthy"
+              ? "bg-green-600 text-white"
+              : status === "review"
+              ? "bg-yellow-500 text-white"
+              : "bg-red-600 text-white"
+          }`}
+        >
+          {status}
+        </span>
+      </header>
+
+      <ul className="text-sm space-y-1">
+        <li>
+          <strong className="text-gray-600 dark:text-gray-300">Type:</strong>{" "}
+          {type}
+        </li>
+        <li>
+          <strong className="text-gray-600 dark:text-gray-300">Age:</strong>{" "}
+          {age} years
+        </li>
+        <li>
+          <strong className="text-gray-600 dark:text-gray-300">Weight:</strong>{" "}
+          {weight} kg
+        </li>
+      </ul>
+    </article>
   );
 }
 
@@ -332,3 +353,79 @@ Función: Indica el estado de la carga de datos. Es un booleano (true o false). 
 |loading|`loading`(boolean)|se muestra el componente loader con un mensaje|
 |loadError|`loadError`(String)|se muestra el componente Alert cuando falla la Api|
 |lista vacia|`Array`([])|muestra un mensaje de que no hay animales creados|
+
+## - ¿Qué significa que un formulario sea controlado en React?
+- un formulario controlado por react es cuando el estado de un `Input` es controlado por `UseState` no permitiendo que el DOM tenga el valor de entrada del `Input`<br>
+El componente `<AnimalForm>`:
+
+    -Asigna el Valor: Se utiliza el atributo value del elemento input para vincularlo a una variable de estado (ej., `<input value={query} ... />`).
+
+    -Controla el Cambio: Se utiliza el handler onChange para llamar inmediatamente a la función que actualiza ese estado (ej., `onChange={(e) => setQuery(e.target.value)}`).
+
+
+## - ¿Por qué es buena práctica separar la lógica de datos en archivos como animalsApi.js en vez de hacer peticiones dentro de los componentes?
+
+   -Separación de Responsabilidades: Los componentes de React se centran en la UI y el estado, mientras que el servicio se centra en la red y la persistencia de datos. Esto hace que cada archivo sea más fácil de entender y mantener.
+
+   -Reutilización: Los métodos de API (getAnimals, createAnimal, etc.) pueden ser importados y utilizados por cualquier otro componente (AnimalListPage, DashboardWidget, etc.) sin duplicar la configuración de Axios o la lógica de manejo de errores.
+
+   -Mantenimiento y Pruebas: Si se cambia la URL de la API o la librería HTTP (de Axios a fetch), solo hay que modificar el archivo `animalsApi.js`. Además, es más fácil probar el servicio de forma aislada.
+
+## - ¿Qué hace que AnimalCard sea un componente reutilizable? ¿Cómo se podría usar una tarjeta similar en otro contexto?
+
+- Recibe toda la información que necesita a través de una sola prop (probablemente animal). No tiene llamadas a la API. Su única responsabilidad es mostrar los detalles del animal (name, type, age, etc.) y de los botones de acción.
+
+    -Una página de Favoritos: En lugar de la lista principal, muestra los animales marcados como favoritos.
+
+    -Una Modal de Detalles: Se muestra una tarjeta similar con más información cuando el usuario hace clic en un animal.
+
+    -Una sección de "Animales Similares": En la página de detalle de un animal, se utiliza para mostrar sugerencias basadas en el tipo.
+
+## - ¿Qué elementos del proyecto contribuyen a la accesibilidad?
+   -`aria-labelledby` y `id` en Secciones:
+```bash
+Ejemplo: <section aria-labelledby="create-animal"> junto con <h2 id="create-animal">.
+```
+
+   -`sr-only` en Etiquetas (`<label>`) Ocultas:
+```bash
+Ejemplo: <label className="sr-only" htmlFor="search">Search</label>.
+```
+
+
+   -Atributo `title` en Botones de Icono:
+```bash
+Ejemplo (presumiblemente en AnimalCard): <button title="Eliminar">🗑️</button>.
+```
+## - Antes de agregar una funcionalidad nueva, ¿qué pasos debes pensar según la filosofía de React? (ej.: qué datos, qué estado, dónde vive la lógica)
+
+- Identificar la Lógica de Datos: ¿Qué cambio necesita el backend?
+
+-Paso de API: Crear una nueva función en animalsApi.js (ej., updateAnimalFavoriteStatus(id, isFavorite)).
+
+- Identificar el Estado: ¿Qué estado necesito para esta funcionalidad?
+
+-Local: Un estado booleano en el componente AnimalCard para controlar la apariencia del icono (lleno/vacío).
+
+-Global: El array de animals en el Farm debe actualizarse cuando el estado de favorito cambie.
+
+- Identificar la Ubicación de la Lógica: ¿Dónde vive la función que maneja el evento?
+
+-La función principal que llama a la API (handleToggleFavorite) debe vivir en el Componente Contenedor (Farm.jsx) porque es responsable de actualizar el estado global de animals.
+
+- Flujo de Datos (Props): ¿Cómo se comunica el Contenedor con la Vista?
+
+-El Farm pasa la función de manejo del evento (onToggleFavorite) como una prop al AnimalList, y este la pasa al AnimalCard.
+
+-El AnimalCard recibe la función y la llama cuando el usuario hace clic en el botón de "favorito".
+
+
+## -¿Qué conceptos de React aprendidos en este proyecto podrías reutilizar en otro tipo de aplicación?
+
+   -Componentes Contenedores vs. Presentacionales: Mantener la lógica de estado y API en un componente padre (Farm) y la UI pura en los hijos (AnimalList, Alert, Loader).
+
+   -Ciclo de Vida con useEffect: Utilizar useEffect con un array de dependencias vacío ([]) para ejecutar código de inicialización (como la carga de datos) solo una vez al inicio.
+
+   -Derivación de Estado con useMemo: Utilizar useMemo para calcular un valor costoso (como la lista de filteredAnimals) solo cuando sus dependencias (animals, query, filter) cambian. Esto es crucial para la optimización del rendimiento.
+
+   -Optimistic UI/Actualización de Estado Inmediata: Actualizar la UI inmediatamente antes de que se confirme la respuesta de la API (ej., setAnimals((prev) => [created, ...prev]) al crear un animal). Esto mejora la percepción de velocidad de la aplicación, aunque requiere manejo de rollback en caso de error.
