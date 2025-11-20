@@ -429,3 +429,20 @@ Ejemplo (presumiblemente en AnimalCard): <button title="Eliminar">🗑️</butto
    -Derivación de Estado con useMemo: Utilizar useMemo para calcular un valor costoso (como la lista de filteredAnimals) solo cuando sus dependencias (animals, query, filter) cambian. Esto es crucial para la optimización del rendimiento.
 
    -Optimistic UI/Actualización de Estado Inmediata: Actualizar la UI inmediatamente antes de que se confirme la respuesta de la API (ej., setAnimals((prev) => [created, ...prev]) al crear un animal). Esto mejora la percepción de velocidad de la aplicación, aunque requiere manejo de rollback en caso de error.
+
+
+# 3 Actividades 1,2,3
+## Actividad 1
+- Cambio del estado `typeFilter` haciendo que tenga un valor inicial de "pig" y "sick" teniendo un impacto visual como se ve en la imagen sin encontrar cartas iniciales.
+<img width="1019" height="840" alt="image" src="https://github.com/user-attachments/assets/0b2f6688-e66b-49e0-adaf-2ef330ebabcd" />
+```bash
+  const [typeFilter, setTypeFilter] = useState("pig");
+  const [statusFilter, setStatusFilter] = useState("sick");
+
+```
+## Actividad 2
+- Agregando filtro por años vista visual del filtro
+<img width="767" height="348" alt="image" src="https://github.com/user-attachments/assets/cb4e6a2e-c181-4f43-b66e-60b297ee18d9" />
+
+## Actividad 3
+
