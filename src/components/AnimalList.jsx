@@ -5,7 +5,7 @@ export default function AnimalList({ animals = [], onSelect, children }) {
   const isEmpty = !animals || animals.length === 0;
 
   return (
-    <section aria-label="Animals list" className="space-y-4">
+    <section aria-label="Animals list" className="space-y-4  w-full rounded-3xl px-9 py-9 dark:bg-gray-700">
       {/* Zona de composición para filtros/acciones */}
       {children && (
         <div className="flex flex-wrap items-center gap-3">{children}</div>
@@ -23,7 +23,7 @@ export default function AnimalList({ animals = [], onSelect, children }) {
         >
           {animals.map((animal) => (
             <li key={animal.id} role="listitem">
-              <AnimalCard animal={animal} onSelect={onSelect} />
+              <AnimalCard animal={animal} onSelect={onSelect}  />
             </li>
           ))}
         </ul>

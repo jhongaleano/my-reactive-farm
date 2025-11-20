@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "../components/Layout.jsx";
 import Alert from "../components/Alert.jsx";
 import Loader from "../components/Loader.jsx";
+import AnimalCard from "../components/AnimalCard.jsx";
 import AnimalList from "../components/AnimalList.jsx";
 import AnimalForm from "../components/AnimalForm.jsx";
 import { getAnimals, createAnimal } from "../services/animalsApi.js";
@@ -9,6 +10,7 @@ import { getAnimals, createAnimal } from "../services/animalsApi.js";
 // Filtros disponibles
 const TYPES = ["all", "cow", "chicken", "sheep", "pig", "other"];
 const STATUSES = ["all", "healthy", "review", "sick"];
+const YEARS = ["all", "1", "2", "3", "4", "5","6", "7", "8", "9", "10"];
 
 export default function Farm() {
   const [animals, setAnimals] = useState([]);
@@ -18,6 +20,7 @@ export default function Farm() {
   // Filtros UI
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const  [yearsFilter, setYearsFilter] = useState("all");
   const [query, setQuery] = useState("");
 
   // Error de envío desde el formulario (red / servidor)
@@ -33,7 +36,8 @@ export default function Farm() {
         const data = await getAnimals();
         if (!cancelled) setAnimals(data);
       } catch (err) {
-        if (!cancelled) setLoadError("Failed to load animals. Please retry.");
+        console.error(err);
+        if (!cancelled) setLoadError("Failed to load animals. Please retry.g");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -53,6 +57,7 @@ export default function Farm() {
       setAnimals((prev) => [created, ...prev]);
       return created;
     } catch (err) {
+      console.error(err);
       setSubmitError("Could not create the animal. Try again.");
       throw err; // mantiene el flujo del formulario
     }
@@ -61,18 +66,22 @@ export default function Farm() {
   // Derivar lista filtrada + búsqueda
   const filteredAnimals = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const yearsFilterNumber = yearsFilter === "all" ? "all" : parseInt(yearsFilter);
     return animals.filter((a) => {
+
       const byType = typeFilter === "all" || a.type === typeFilter;
       const byStatus = statusFilter === "all" || a.status === statusFilter;
+      const byYears = yearsFilterNumber === "all" || a.age === yearsFilterNumber;
+
       const byQuery =
         q.length === 0 ||
         a.name?.toLowerCase().includes(q) ||
         a.type?.toLowerCase().includes(q) ||
         String(a.weight).includes(q) ||
         String(a.age).includes(q);
-      return byType && byStatus && byQuery;
+      return byType && byStatus && byYears && byQuery;
     });
-  }, [animals, typeFilter, statusFilter, query]);
+  }, [animals, typeFilter, statusFilter,yearsFilter, query]);
 
   return (
     <Layout title="My Reactive Farm 🐄🌾">
@@ -83,13 +92,7 @@ export default function Farm() {
       {/* Contenido principal */}
       {!loading && !loadError && (
         <div className="space-y-8">
-          {/* Formulario controlado para crear animales */}
-          <section aria-labelledby="create-animal">
-            <h2 id="create-animal" className="mb-3 text-xl font-semibold">
-              Add new animal
-            </h2>
-            <AnimalForm onSubmit={handleCreate} submitError={submitError} />
-          </section>
+          
 
           {/* Filtros y lista */}
           <section aria-labelledby="animals-list">
@@ -146,8 +149,32 @@ export default function Farm() {
                     </option>
                   ))}
                 </select>
+
+                {/* Years filter */}
+                <label className="sr-only" htmlFor="years-filter">
+                  Years
+                </label>
+                <select
+                  id="years-filter"
+                  value={yearsFilter}
+                  onChange={(e) => setYearsFilter(e.target.value)}
+                  className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-100"
+                >
+                  {YEARS.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </AnimalList>
+            </AnimalList  >
+          </section>
+          {/* Formulario controlado para crear animales */}
+          <section aria-labelledby="create-animal">
+            <h2 id="create-animal" className="mb-3 text-xl font-semibold">
+              Add new animal
+            </h2>
+            <AnimalForm onSubmit={handleCreate} submitError={submitError} />
           </section>
         </div>
       )}

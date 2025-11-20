@@ -87,6 +87,7 @@ export default function AnimalForm({
       setValues(initialValues);
       onSuccess?.(result ?? payload);
     } catch (err) {
+      console.error(err);
       // Errores de red/servidor se muestran vía submitError (prop)
       setFormMessage(null);
     } finally {
@@ -306,7 +307,7 @@ export default function AnimalForm({
             setErrors({});
             setFormMessage(null);
           }}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-600 dark:border-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-800"
+          className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:bg-red-600 dark:border-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-800"
           disabled={submitting}
         >
           Reset
